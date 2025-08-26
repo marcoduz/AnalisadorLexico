@@ -9,7 +9,10 @@ O autômato gerado é projetado para ser utilizado na construção de analisador
 ## Funcionalidades
 
 - **Entrada**: Aceita definições de tokens e gramáticas não regulares como entrada.
-- **Processamento**: Converte as regras gramaticais em um Autômato Finito Determinístico, aplicando a seguinte sequência: - Montar Autômatos Finitos Não Determinísticos (AFND), um para cada token e gramática. - Unir todos os AFNDs gerados anteriormente em um único. - Determinizar o AFND anterior.
+- **Processamento**: Converte as regras gramaticais em um Autômato Finito Determinístico, aplicando a seguinte sequência:
+  - Montar Autômatos Finitos Não Determinísticos (AFND), um para cada token e gramática.
+  - Unir todos os AFNDs gerados anteriormente em um único.
+  - Determinizar o AFND resultante para gerar o AFD final.
 - **Saída**: Gera uma representação clara do AFD, incluindo seus estados, alfabeto, função de transição, estado inicial e estados de aceitação.
 
 ## Tecnologias Utilizadas
