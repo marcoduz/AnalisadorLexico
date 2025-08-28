@@ -8,22 +8,22 @@ class AFND:
                            A chave é uma tupla (estado, simbolo) e o valor é um conjunto de estados.
                            Para transições epsilon (ε), use '' como o símbolo.
                            Ex: {('q0', 'a'): {'q1'}, ('q1', ''): {'q2'}}
-        estado_inicial (str): O estado inicial (ex: 'q0').
-        estados_finais (set): Conjunto dos estados de aceitação/finais (ex: {'q2'}).
+        estadoInicial (str): O estado inicial (ex: 'q0').
+        estadosFinais (set): Conjunto dos estados de aceitação/finais (ex: {'q2'}).
 
         **SET: não permite elementos duplicados, Unordered, Mutável 
     """
-    def __init__(self, estados, alfabeto, transicoes, estado_inicial, estados_finais):
+    def __init__(self, estados, alfabeto, transicoes, estadoInicial, estadosFinais):
         self.estados = set(estados)
         self.alfabeto = set(alfabeto)
         self.transicoes = transicoes
-        self.estado_inicial = estado_inicial
-        self.estados_finais = set(estados_finais)
+        self.estadoInicial = estadoInicial
+        self.estadosFinais = set(estadosFinais)
         
     def adicionar_estado(self, estado, eh_final=False):
         self.estados.add(estado)
         if eh_final:
-            self.estados_finais.add(estado)
+            self.estadosFinais.add(estado)
     
     def adicionar_transicao(self, origem, simbolo, destino):
         if origem not in self.estados:
@@ -42,9 +42,12 @@ class AFND:
     def exibir_automato(self):
         """
         Exibe a tabela de transições de um AFND no terminal de forma formatada.
-        Pedi pro Gemini gerar esta função
+        Gerado pelo gemini
         """
-        estados_ordenados = sorted(list(self.estados))
+        estado_inicial = self.estadoInicial
+        outros_estados = self.estados - {estado_inicial}
+        outros_estados_ordenados = sorted(list(outros_estados))
+        estados_ordenados = [estado_inicial] + outros_estados_ordenados
         
         has_epsilon = any(simbolo == '' for _, simbolo in self.transicoes.keys())
         
@@ -58,9 +61,9 @@ class AFND:
         largura_col_estados = 0
         for estado in estados_ordenados:
             prefixo = ""
-            if estado == self.estado_inicial:
+            if estado == self.estadoInicial:
                 prefixo += "->"
-            if estado in self.estados_finais:
+            if estado in self.estadosFinais:
                 prefixo += "*"
             largura_col_estados = max(largura_col_estados, len(f"{prefixo}{estado}"))
 
@@ -78,16 +81,16 @@ class AFND:
             print(f" {display_simbolo:^{largura_cols[simbolo]}} |", end="")
         print()
 
-        print(f"{'-' * largura_col_estados}-+", end="")
+        print(f"{'-' * largura_col_estados}+", end="")
         for simbolo in alfabeto_ordenado:
-            print(f"{'-' * (largura_cols[simbolo] + 2)}-+", end="")
+            print(f"{'-' * (largura_cols[simbolo] + 2)}+", end="")
         print()
 
         for estado in estados_ordenados:
             prefixo = ""
-            if estado == self.estado_inicial:
+            if estado == self.estadoInicial:
                 prefixo += "->"
-            if estado in self.estados_finais:
+            if estado in self.estadosFinais:
                 prefixo += "*"
             
             label_estado = f"{prefixo}{estado}"
