@@ -1,3 +1,5 @@
+from collections import deque
+
 class AFND:
     """
     Representa um Autômato Finito Não Determinístico (AFND).
@@ -39,6 +41,87 @@ class AFND:
         else:
             self.transicoes[chave] = {destino}
 
+    """
+    Converte este AFND em um AFD usando o algoritmo de construção de subconjuntos.
+    Retorna um novo objeto AFND que é determinístico.
+    peguei do Gemini
+    """
+    def determinizar(self):
+        estado_inicial_afd_set = {self.estadoInicial}
+        
+        dfa_transicoes = {}
+        dfa_estados_finais = set()
+
+        mapa_estados = {frozenset(estado_inicial_afd_set): 'D0'}
+        fila_trabalho = deque([estado_inicial_afd_set])
+        contador_estados = 1
+
+        while fila_trabalho:
+            conjunto_atual_nfa = fila_trabalho.popleft()
+            nome_estado_atual_dfa = mapa_estados[frozenset(conjunto_atual_nfa)]
+
+            for simbolo in self.alfabeto:
+                proximos_estados_nfa = set()
+                for estado_nfa in conjunto_atual_nfa:
+                    destinos = self.transicoes.get((estado_nfa, simbolo), set())
+                    proximos_estados_nfa.update(destinos)
+                
+                if not proximos_estados_nfa:
+                    continue
+                
+                proximo_conjunto_nfa = proximos_estados_nfa
+                
+                chave_proximo_conjunto = frozenset(proximo_conjunto_nfa)
+                
+                if chave_proximo_conjunto not in mapa_estados:
+                    novo_nome_estado_dfa = f'D{contador_estados}'
+                    mapa_estados[chave_proximo_conjunto] = novo_nome_estado_dfa
+                    fila_trabalho.append(proximo_conjunto_nfa)
+                    contador_estados += 1
+                
+                nome_proximo_estado_dfa = mapa_estados[chave_proximo_conjunto]
+                dfa_transicoes[(nome_estado_atual_dfa, simbolo)] = {nome_proximo_estado_dfa}
+
+        dfa_estados = set(mapa_estados.values())
+        for conjunto_nfa, nome_dfa in mapa_estados.items():
+            if not conjunto_nfa.isdisjoint(self.estadosFinais):
+                dfa_estados_finais.add(nome_dfa)
+
+        return AFND(
+            estados=dfa_estados,
+            alfabeto=self.alfabeto,
+            transicoes=dfa_transicoes,
+            estadoInicial='D0',
+            estadosFinais=dfa_estados_finais
+        )
+    
+    """
+    Retorna o próximo estado para um AFD.
+
+    Args:
+        estadoAtual (str): O estado em que o autômato está.
+        simbolo (str): O símbolo de entrada lido.
+
+    Returns:
+        str: O nome do próximo estado, se a transição existir.
+        None: Se não houver transição definida.
+    """
+    def proximoEstado(self, estadoAtual, simbolo):
+        # A chave que procuramos no dicionário de transições
+        chave_transicao = (estadoAtual, simbolo)
+        
+        # Usamos .get() para buscar a chave de forma segura.
+        # Se a chave não existir, ele retorna um conjunto vazio (definido por nós).
+        conjunto_destino = self.transicoes.get(chave_transicao, set())
+        
+        # Se o conjunto não estiver vazio, uma transição foi encontrada.
+        if conjunto_destino:
+            # Como é um AFD, sabemos que o conjunto terá apenas UM elemento.
+            # Podemos pegá-lo convertendo para lista ou usando next(iter(...))
+            return list(conjunto_destino)[0]
+        else:
+            return None
+    
     def exibir_automato(self):
         """
         Exibe a tabela de transições de um AFND no terminal de forma formatada.
