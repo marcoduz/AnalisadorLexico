@@ -2,6 +2,8 @@ from AFND import AFND
 
 """
     Monta um Automâto finito não deterministico de acordo com os tokens recebidos
+    Percorre o token cada caracter se torna um símbolo do alfabeto e é gerado um novo estado
+    saindo do estadoAtual para o novoEstado montado ao ler um símbolo
     Atributos:
         tokens (Array): Conjunto de todas as palavra/tokens (ex: [se, enquanto]).
         AFNDs (Array): Conjunto de automatos a qual será acrescentado os novos automatos gerados
@@ -78,15 +80,16 @@ def unirAFNDs(AFNDs, estadoInicial = 'q0'):
     for i, automato in enumerate(AFNDs):
         mapaRenomeacao = {automato.estadoInicial: estadoInicial}
         
+        ##mapaRenomeacao é um dicionario que relaciona o estado do automato ao seu novo nome no novo automato
         # Os outros estados recebem um prefixo para serem únicos
         outros_estados = automato.estados - {automato.estadoInicial}
         for estado in outros_estados:
             mapaRenomeacao[estado] = f"{i}.{estado}"
         
-        # Adiciona os novos estados renomeados
+        # Adiciona os novos estados renomeados aos estados do novo automato 
+        # e adiciona o alfabeto deste automato ao alfabet do novo automato
+        # por ser set não corre o risco de duplicatas
         novosEstados.update(mapaRenomeacao.values())
-
-        # Adiciona o alfabeto
         novoAlfabeto.update(automato.alfabeto)
 
         # Adiciona os estados finais renomeados
