@@ -26,9 +26,32 @@ def usingTokens(tokens, AFNDs = []):
     
     return AFNDs
 
+##@todo
+# tava pensando se a gramática vai ser só no formato simboloVariavel (sA)
+# se tiver algo como simboloVariavelSimbolo (sAs) não sei como fazer
 def usingGramaticas(gramaticas, AFNDs = []):
-    ##@todo
-    print('a fazer')
+    automato = AFND({'q0'}, set(), {}, 'q0', set())     
+
+    for gramatica in gramaticas:
+        relacao_estado_letra = dict()
+        for i, producao in enumerate(gramatica):
+            estado, restante = producao.split('::=')
+            producoes = restante.split('|')
+            if estado not in relacao_estado_letra:
+                relacao_estado_letra[estado] = 'q'+str(i)
+                automato.adicionar_estado('q'+str(i))
+
+            for p in producoes:
+                for simbolo in p:
+                    if(ord(simbolo)>=65 and ord(simbolo)<=90):
+                        if simbolo not in relacao_estado_letra:
+                            tam = len(relacao_estado_letra)
+                            relacao_estado_letra[simbolo] = 'q'+str(tam)
+                            automato.adicionar_estado('q'+str(tam))
+                    else:
+                        automato.alfabeto.add(simbolo)
+    print(automato.estados, automato.alfabeto)
+    
 
 """
     Junta dois ou mais automatos finitos não deterministicos em um único
@@ -58,7 +81,7 @@ def unirAFNDs(AFNDs, estadoInicial = 'q0'):
         # Os outros estados recebem um prefixo para serem únicos
         outros_estados = automato.estados - {automato.estadoInicial}
         for estado in outros_estados:
-            mapaRenomeacao[estado] = f"{i}_{estado}"
+            mapaRenomeacao[estado] = f"{i}.{estado}"
         
         # Adiciona os novos estados renomeados
         novosEstados.update(mapaRenomeacao.values())
