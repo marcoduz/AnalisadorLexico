@@ -49,12 +49,12 @@ Para executar o projeto, você precisará ter o Python 3.13.4 (ou uma versão co
     python main.py
     ```
     Certifique-se de iniciar as variáveis no arquivo main.py com seus tokens e gramáticas como no exemplo abaixo
+
     ```bash
     tokens = ['se', 'sai', 'foi']
     gramaticas = [['S::=fA|aA|eA|iA', 'A::=fA|aA|eA|iA|']]
-   ```
-
-
+    ```
+    
 ## Autores
 
 - **Marco Antonio Duz**
