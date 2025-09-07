@@ -28,32 +28,90 @@ def usingTokens(tokens, AFNDs = []):
     
     return AFNDs
 
-##@todo
-# tava pensando se a gramática vai ser só no formato simboloVariavel (sA)
-# se tiver algo como simboloVariavelSimbolo (sAs) não sei como fazer
-def usingGramaticas(gramaticas, AFNDs = []):
-    automato = AFND({'q0'}, set(), {}, 'q0', set())     
+"""
+Recebe uma lista de gramáticas e cria um AFND independente para cada uma.
 
+Args:
+    gramaticas (list): Uma lista onde cada item é uma gramática.
+                        Ex: [['S::=aA'], ['B::=bB']]
+    AFNDs (list): Lista inicial para popular (opcional).
+
+Returns:
+    list: Uma lista contendo todos os objetos AFND criados.
+"""
+def usingGramaticas(gramaticas, AFNDs=[]):
     for gramatica in gramaticas:
-        relacao_estado_letra = dict()
-        for i, producao in enumerate(gramatica):
+        relacaoNaoTerminalEstado = {}
+        estadosFinais = set()
+        estadosAutomato = set()
+        naoTerminais = set()
+        
+        ##Este for percorre a gramaticapara encontrar todos os símbolos não terminais ou seja letras maiusculas
+        ##Também define os estados finais que são aqueles que possuem uma produção vazia
+        for producao in gramatica:
             estado, restante = producao.split('::=')
-            producoes = restante.split('|')
-            if estado not in relacao_estado_letra:
-                relacao_estado_letra[estado] = 'q'+str(i)
-                automato.adicionar_estado('q'+str(i))
+            naoTerminais.add(estado)
+            for producao in restante.split('|'):
+                if(producao == ''):
+                    estadosFinais.add(estado.strip())
+                for char in producao.strip():
+                    if 'A' <= char <= 'Z':
+                        naoTerminais.add(char)
+        
+        ##Deixar o S no inicio da lista para ele sempre ser o estado inicial
+        outros = naoTerminais - {'S'}
+        outros = sorted(list(outros))
+        naoTerminais = ['S'] + outros
+        
+        # Mapeia cada não-terminal a um nome de estado único para este autômato
+        for i, nt in enumerate(list(naoTerminais)):
+            novoNome = f'q{i}'
+            relacaoNaoTerminalEstado[nt] = novoNome
+            estadosAutomato.add(novoNome)
 
-            for p in producoes:
-                for simbolo in p:
-                    if(ord(simbolo)>=65 and ord(simbolo)<=90):
-                        if simbolo not in relacao_estado_letra:
-                            tam = len(relacao_estado_letra)
-                            relacao_estado_letra[simbolo] = 'q'+str(tam)
-                            automato.adicionar_estado('q'+str(tam))
-                    else:
-                        automato.alfabeto.add(simbolo)
-    print(automato.estados, automato.alfabeto)
-    
+        # Assume que o primeiro não-terminal encontrado é o inicial
+        simbolo_inicial = gramatica[0].split('::=')[0].strip()
+        estadoInicial = relacaoNaoTerminalEstado[simbolo_inicial]
+        
+        # --- Monta o objeto do automato ainda sem as transições ---
+        automato = AFND(
+            estados=estadosAutomato,
+            alfabeto=set(),
+            transicoes={},
+            estadoInicial=estadoInicial,
+            estadosFinais=set()
+        )
+
+        # Constrói as transições para o autômato novo
+        for producao in gramatica:
+            estado, restante = producao.split('::=')
+            estadoOrigem = relacaoNaoTerminalEstado[estado.strip()]
+            
+            for producao in restante.split('|'):
+                producao = producao.strip()
+                proximoEstado = ''
+                terminal = ''
+                for char in producao:
+                    if 'A' <= char <= 'Z':
+                        proximoEstado = char
+                    else: 
+                        terminal += char
+                
+                if(terminal):
+                    automato.alfabeto.add(terminal)
+                else:
+                    automato.estadosFinais.add(estadoOrigem)
+
+                if(not proximoEstado):
+                    continue
+                
+                proximoEstado = relacaoNaoTerminalEstado.get(proximoEstado)
+                automato.adicionar_transicao(estadoOrigem, terminal, proximoEstado)
+        
+        # Adiciona o autômato recém-criado à lista de automatos
+        AFNDs.append(automato)
+            
+    return AFNDs    
 
 """
     Junta dois ou mais automatos finitos não deterministicos em um único
