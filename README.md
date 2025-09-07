@@ -54,11 +54,9 @@ Para executar o projeto, você precisará ter o Python 3.13.4 (ou uma versão co
     tokens = ['se', 'sai', 'foi']
     gramaticas = [['S::=fA|aA|eA|iA', 'A::=fA|aA|eA|iA|']]
     ```
-    
+
 ## Autores
 
-- **Marco Antonio Duz**
-- **Mátriculo**: 2311100006
+- **Marco Antonio Duz** Mátricula: 2311100006
 
-- **Carlos Giovane Neu Nogueira**
-- **Mátriculo**: 2311100010
+- **Carlos Giovane Neu Nogueira** Mátricula: 2311100010
