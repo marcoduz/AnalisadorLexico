@@ -1,16 +1,16 @@
 from montaAutomato import *
 from analisadorLexico import *
 
-tokens = ['sei', 'nem', 'sai']
-gramaticas = [['S::=oA|qA|tA', 'A::=oA|qA|tA']]
+tokens = ['se', 'sai', 'foi']
+gramaticas = [['S::=fA|aA|eA|iA', 'A::=fA|aA|eA|iA|']]
 fita = []
 ts = []
 
 AFNDs = []
 AFNDs = usingTokens(tokens)
+AFNDs = usingGramaticas(gramaticas, AFNDs)
 AFNDUnique = unirAFNDs(AFNDs)
 AFDetrministico = AFNDUnique.determinizar()
-# AFDetrministico.exibir_automato()
 analisadorLexico(AFDetrministico, fita, ts)
 
 print(fita)
