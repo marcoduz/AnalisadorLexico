@@ -33,13 +33,13 @@ Para executar o projeto, você precisará ter o Python 3.13.4 (ou uma versão co
 1.  **Clone o repositório:**
 
     ```bash
-    git clone [https://github.com/marcoduz/GERADORDOAFD.git](https://github.com/marcoduz/GERADORDOAFD.git)
+    git clone https://github.com/marcoduz/AnalisadorLexico.git
     ```
 
 2.  **Navegue até o diretório do projeto:**
 
     ```bash
-    cd GERADORDOAFD
+    cd AnalisadorLexico
     ```
 
 3.  **Execute o programa:**
