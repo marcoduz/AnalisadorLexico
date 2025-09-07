@@ -2,18 +2,21 @@
 
 ## Descrição
 
-Este projeto é uma ferramenta desenvolvida em Python para a matéria de construção de compiladoreso, do curso de Ciêncida da computação - UFFS. O programa recebe como entrada um conjunto de **tokens** e **gramáticas não regulares** e, a partir deles, gera um **Autômato Finito Determinístico (AFD)**.
+Este projeto é uma ferramenta desenvolvida em Python para a matéria de construção de compiladoreso, do curso de Ciêncida da computação - UFFS. O programa recebe como entrada um conjunto de **tokens** e **gramáticas não regulares** e, a partir deles, gera um **Autômato Finito Determinístico (AFD)**. 
 
-O autômato gerado é projetado para ser utilizado na construção de analisadores léxicos (scanners), que são a primeira fase de um compilador, responsáveis por reconhecer os padrões da linguagem de entrada.
+Este então é utilizado para efetuar a análise léxica de um **código**, também inserido como entrada em um arquivo.
 
 ## Funcionalidades
 
-- **Entrada**: Aceita definições de tokens e gramáticas não regulares como entrada.
+- **Entradas**: 
+ - Arquivo contendo o código a ser analisado pelo analisador lexico caminho ./arquivos/tokens.txt
+ - No próprio códico inserir um array com os tokens, ['if', 'else'] e outro com as gramáticas, [['S::=aS|bS|']], para o épson finalizar com | as produções 
 - **Processamento**: Converte as regras gramaticais em um Autômato Finito Determinístico, aplicando a seguinte sequência:
   - Montar Autômatos Finitos Não Determinísticos (AFND), um para cada token e gramática.
   - Unir todos os AFNDs gerados anteriormente em um único.
   - Determinizar o AFND resultante para gerar o AFD final.
-- **Saída**: Gera uma representação clara do AFD, incluindo seus estados, alfabeto, função de transição, estado inicial e estados de aceitação.
+Após efetua a leitura do codigo.txt simulando a leitura de um código e gera a fita e tabela de símbolos da análise léxica do arquivo considerando os tokens e gramáticas inseirdas anteriormente
+- **Saída**: Fita e tabela de símbolos.
 
 ## Tecnologias Utilizadas
 
@@ -30,7 +33,7 @@ Para executar o projeto, você precisará ter o Python 3.13.4 (ou uma versão co
 1.  **Clone o repositório:**
 
     ```bash
-    git clone [https://github.com/seu-usuario/GERADORDOAFD.git](https://github.com/seu-usuario/GERADORDOAFD.git)
+    git clone [https://github.com/marcoduz/GERADORDOAFD.git](https://github.com/marcoduz/GERADORDOAFD.git)
     ```
 
 2.  **Navegue até o diretório do projeto:**
@@ -40,40 +43,22 @@ Para executar o projeto, você precisará ter o Python 3.13.4 (ou uma versão co
     ```
 
 3.  **Execute o programa:**
-    _(Adapte esta seção para a forma como seu programa é executado. Abaixo está um exemplo)_
+   Insira o código a ser análisado dentro da pasta arquivos com o nome codigo.txt em seguida rode o comando abaixo:
+
     ```bash
-    python main.py < arquivo_de_entrada.txt
+    python main.py
     ```
-    Certifique-se de fornecer os arquivos de entrada necessários (com os tokens e a gramática), conforme a implementação do seu programa.
+    Certifique-se de iniciar as variáveis no arquivo main.py com seus tokens e gramáticas como no exemplo abaixo
+    ```bash
+    tokens = ['se', 'sai', 'foi']
+    gramaticas = [['S::=fA|aA|eA|iA', 'A::=fA|aA|eA|iA|']]
+   ```
 
-## Exemplo de Uso
 
-_(Opcional: Se você tiver um exemplo claro de entrada e saída, pode adicioná-lo aqui para facilitar o entendimento.)_
-
-**Entrada (exemplo de arquivo `gramatica.txt`):**
-
-```
-DIGITO=[0-9]
-LETRA=[a-zA-Z]
-ID={LETRA}({LETRA}|{DIGITO})*
-```
-
-**Saída (exemplo):**
-
-```
-Autômato Finito Determinístico gerado:
-Estados: {q0, q1, q2}
-Alfabeto: {letra, digito}
-Estado Inicial: q0
-Estados Finais: {q2}
-Transições:
-  - (q0, letra) -> q1
-  - (q1, letra) -> q2
-  - (q1, digito) -> q2
-  ...
-```
-
-## Autor
+## Autores
 
 - **Marco Antonio Duz**
-- **GitHub**: `https://github.com/marcoduz`
+- **Mátriculo**: 2311100006
+
+- **Carlos Giovane Neu Nogueira**
+- **Mátriculo**: 2311100010
