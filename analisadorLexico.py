@@ -19,6 +19,5 @@ def analisadorLexico(AFD, fita, ts):
                         estadoCorrente = 'X'
                     fita.append(estadoCorrente)
                     ts.append({'linha': i, 'estado': estadoCorrente, 'label': label})
-            pass
     except FileNotFoundError:
         print("Erro ao abrir o arquivo")
