@@ -10,23 +10,26 @@ from AFND import AFND
     Retorno:
         retorna Array de automatos AFNDs modificado
     """
-def usingTokens(tokens, AFNDs = []): 
+
+
+def usingTokens(tokens: list, AFNDs: list = []):
     for t in tokens:
-        automato = AFND({'q0'}, set(), {}, 'q0', set())
-        i=0
-        estadoAtual='q0'
+        automato = AFND({"q0"}, set(), {}, "q0", set())
+        i = 0
+        estadoAtual = "q0"
         for c in t:
-            i+=1
-            novoEstado = 'q'+ str(i)
+            i += 1
+            novoEstado = "q" + str(i)
             automato.alfabeto.add(c)
             automato.adicionar_estado(novoEstado)
             automato.adicionar_transicao(estadoAtual, c, novoEstado)
             estadoAtual = novoEstado
-        
+
         automato.estadosFinais.add(estadoAtual)
         AFNDs.append(automato)
-    
+
     return AFNDs
+
 
 """
 Recebe uma lista de gramáticas e cria um AFND independente para cada uma.
@@ -39,79 +42,82 @@ Args:
 Returns:
     list: Uma lista contendo todos os objetos AFND criados.
 """
-def usingGramaticas(gramaticas, AFNDs=[]):
+
+
+def usingGramaticas(gramaticas: list[str], AFNDs: list[AFND] = []):
     for gramatica in gramaticas:
         relacaoNaoTerminalEstado = {}
         estadosFinais = set()
         estadosAutomato = set()
         naoTerminais = set()
-        
+
         ##Este for percorre a gramaticapara encontrar todos os símbolos não terminais ou seja letras maiusculas
         ##Também define os estados finais que são aqueles que possuem uma produção vazia
         for producao in gramatica:
-            estado, restante = producao.split('::=')
+            estado, restante = producao.split("::=")
             naoTerminais.add(estado)
-            for producao in restante.split('|'):
-                if(producao == ''):
+            for producao in restante.split("|"):
+                if producao == "":
                     estadosFinais.add(estado.strip())
                 for char in producao.strip():
-                    if 'A' <= char <= 'Z':
+                    if "A" <= char <= "Z":
                         naoTerminais.add(char)
-        
+
         ##Deixar o S no inicio da lista para ele sempre ser o estado inicial
-        outros = naoTerminais - {'S'}
+        outros = naoTerminais - {"S"}
         outros = sorted(list(outros))
-        naoTerminais = ['S'] + outros
-        
+        naoTerminais = ["S"] + outros
+
         # Mapeia cada não-terminal a um nome de estado único para este autômato
         for i, nt in enumerate(list(naoTerminais)):
-            novoNome = f'q{i}'
+            novoNome = f"q{i}"
             relacaoNaoTerminalEstado[nt] = novoNome
             estadosAutomato.add(novoNome)
 
         # Assume que o primeiro não-terminal encontrado é o inicial
-        simbolo_inicial = gramatica[0].split('::=')[0].strip()
+        simbolo_inicial = gramatica[0].split("::=")[0].strip()
         estadoInicial = relacaoNaoTerminalEstado[simbolo_inicial]
-        
+
         # --- Monta o objeto do automato ainda sem as transições ---
         automato = AFND(
             estados=estadosAutomato,
             alfabeto=set(),
             transicoes={},
             estadoInicial=estadoInicial,
-            estadosFinais=set()
+            estadosFinais=set(),
         )
 
         # Constrói as transições para o autômato novo
         for producao in gramatica:
-            estado, restante = producao.split('::=')
+            estado, restante = producao.split("::=")
             estadoOrigem = relacaoNaoTerminalEstado[estado.strip()]
-            
-            for producao in restante.split('|'):
+
+            for producao in restante.split("|"):
                 producao = producao.strip()
-                proximoEstado = ''
-                terminal = ''
+                proximoEstado = ""
+                terminal = ""
                 for char in producao:
-                    if 'A' <= char <= 'Z':
+                    if "A" <= char <= "Z":
                         proximoEstado = char
-                    else: 
+                    else:
                         terminal += char
-                
-                if(terminal):
+
+                if terminal:
                     automato.alfabeto.add(terminal)
                 else:
                     automato.estadosFinais.add(estadoOrigem)
 
-                if(not proximoEstado):
+                if not proximoEstado:
                     continue
-                
+
                 proximoEstado = relacaoNaoTerminalEstado.get(proximoEstado)
                 automato.adicionar_transicao(estadoOrigem, terminal, proximoEstado)
-        
+
         # Adiciona o autômato recém-criado à lista de automatos
         AFNDs.append(automato)
-            
-    return AFNDs    
+
+    return AFNDs
+
 
 """
     Junta dois ou mais automatos finitos não deterministicos em um único
@@ -122,14 +128,16 @@ def usingGramaticas(gramaticas, AFNDs=[]):
     Retorno:
         retorna o objeto do novo Automato
 """
-def unirAFNDs(AFNDs, estadoInicial = 'q0'):
 
-    #Verificações se existe um autômato e se existe somente 1
+
+def unirAFNDs(AFNDs: list[AFND], estadoInicial="q0"):
+
+    # Verificações se existe um autômato e se existe somente 1
     if not AFNDs:
         return AFND({estadoInicial}, set(), {}, estadoInicial, set())
     if len(AFNDs) == 1:
         return AFNDs[0]
-    
+
     novosEstados = {estadoInicial}
     novoAlfabeto = set()
     novasTransicoes = {}
@@ -137,14 +145,14 @@ def unirAFNDs(AFNDs, estadoInicial = 'q0'):
 
     for i, automato in enumerate(AFNDs):
         mapaRenomeacao = {automato.estadoInicial: estadoInicial}
-        
+
         ##mapaRenomeacao é um dicionario que relaciona o estado do automato ao seu novo nome no novo automato
         # Os outros estados recebem um prefixo para serem únicos
         outros_estados = automato.estados - {automato.estadoInicial}
         for estado in outros_estados:
             mapaRenomeacao[estado] = f"{i}.{estado}"
-        
-        # Adiciona os novos estados renomeados aos estados do novo automato 
+
+        # Adiciona os novos estados renomeados aos estados do novo automato
         # e adiciona o alfabeto deste automato ao alfabet do novo automato
         # por ser set não corre o risco de duplicatas
         novosEstados.update(mapaRenomeacao.values())
@@ -158,9 +166,9 @@ def unirAFNDs(AFNDs, estadoInicial = 'q0'):
         for (origem, simbolo), destinos in automato.transicoes.items():
             nova_origem = mapaRenomeacao[origem]
             novos_destinos = {mapaRenomeacao[d] for d in destinos}
-            
+
             chave_transicao = (nova_origem, simbolo)
-            
+
             # Se já existe uma transição para esta chave, une os destinos
             if chave_transicao in novasTransicoes:
                 novasTransicoes[chave_transicao].update(novos_destinos)
@@ -173,5 +181,5 @@ def unirAFNDs(AFNDs, estadoInicial = 'q0'):
         alfabeto=novoAlfabeto,
         transicoes=novasTransicoes,
         estadoInicial=estadoInicial,
-        estadosFinais=novosEstadosFinais
+        estadosFinais=novosEstadosFinais,
     )
