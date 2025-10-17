@@ -69,7 +69,7 @@ class SLR:
         print("--- Produções Numeradas ---\n")
         if self.producoes:
             for prod in self.producoes:
-                print(prod)
+                print(prod[1])
         else:
             print("Nenhuma produção encontrada.")
 

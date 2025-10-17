@@ -97,6 +97,7 @@ def gerar_gramatica(glc: GLC) -> str | None:
 
         for producao in producoes:
             regra = f"{nao_terminal} -> {producao.replace('ε', "''")}"
+            print(regra)
             regras_texto.append(regra)
 
     gramatica_final_texto = "\n".join(regras_texto)

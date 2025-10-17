@@ -30,7 +30,7 @@ class GLC:
                 self.regras.append(nova_regra)
 
         for estado_final in afd.estadosFinais:
-            nova_regra = f"{estado_final} ::= "
+            nova_regra = f"{estado_final} ::= ε"
             self.regras.append(nova_regra)
 
         self.criarGramatica()
