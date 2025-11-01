@@ -1,10 +1,9 @@
-from AFND import AFND
+from automato.AFND import AFND
 
 
 def analisadorLexico(AFD: AFND, fita: list, ts: list):
     try:
         with open("./arquivos/codigo.txt", "r") as arquivo:
-            print("lendo o arquivo")
             for i, linha in enumerate(arquivo):
                 linhaFormatada = linha.strip()  ##Remove o \n da quebra de linha
                 linhaSplit = linhaFormatada.split(" ")
@@ -23,4 +22,4 @@ def analisadorLexico(AFD: AFND, fita: list, ts: list):
                     fita.append(estadoCorrente)
                     ts.append({"linha": i, "estado": estadoCorrente, "label": label})
     except FileNotFoundError:
-        print("Erro ao abrir o arquivo")
+        print("Erro ao abrir o arquivo './arquivos/codigo.txt'")
