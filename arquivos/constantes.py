@@ -1,5 +1,6 @@
 TOKENS = [
     "if",
+    "else",
     "(",
     ")",
     "{",
@@ -10,7 +11,6 @@ TOKENS = [
     "-",
     "*",
     "/",
-    "&",
     ">",
     "<",
     ">=",
@@ -22,10 +22,14 @@ TOKENS = [
     "true",
     "false",
 ]
-GRAMATICAS = [
-    ["S::=$A", "A::=a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|w|y|z"],
-    ["S::=1A|2A|3A|4A|5A|6A|7A|8A|9A|0A", "A::=1A|2A|3A|4A|5A|6A|7A|8A|9A|0A|"],
-]
+
+GRAMATICAS = {
+    "t_id": ["S::=$A", "A::=a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|w|y|z"],
+    "t_num": [
+        "S::=1A|2A|3A|4A|5A|6A|7A|8A|9A|0A",
+        "A::=1A|2A|3A|4A|5A|6A|7A|8A|9A|0A|",
+    ],
+}
 
 SIMBOLO_INICIAL = "BLOCO_CODIGO"
 
@@ -45,6 +49,7 @@ NAO_TERMINAIS = [
 
 TERMINAIS = [
     "if",
+    "else",
     "(",
     ")",
     "{",
@@ -60,13 +65,13 @@ TERMINAIS = [
     "!=",
     "or",
     "and",
-    "t_id",
     "=",
     ";",
     "+",
     "-",
     "*",
     "/",
+    "t_id",
     "t_num",
 ]
 

@@ -23,18 +23,18 @@ class AFND:
         alfabeto: set[str],
         transicoes: dict[tuple[str, str], set[str]],
         estadoInicial: str,
-        estadosFinais: set[str],
+        estadosFinais: dict[str, str],
     ):
         self.estados = set(estados)
         self.alfabeto = set(alfabeto)
         self.transicoes = transicoes
         self.estadoInicial = estadoInicial
-        self.estadosFinais = set(estadosFinais)
+        self.estadosFinais = dict(estadosFinais)
 
-    def adicionar_estado(self, estado, eh_final=False):
+    def adicionar_estado(self, estado, token: str = None):
         self.estados.add(estado)
-        if eh_final:
-            self.estadosFinais.add(estado)
+        if token is not None:
+            self.estadosFinais[estado] = token
 
     def adicionar_transicao(self, origem: str, simbolo: str, destino: str):
         if origem not in self.estados:
@@ -61,6 +61,7 @@ class AFND:
         estadoInicialAfd = {self.estadoInicial}
         afdTransicoes = {}
         afdEstadosFinais = set()
+        afdEstadosFinais = {}
 
         mapa_estados = {
             frozenset(estadoInicialAfd): "D0"
@@ -100,9 +101,18 @@ class AFND:
                 }
 
         dfa_estados = set(mapa_estados.values())
+
         for conjunto_nfa, nome_dfa in mapa_estados.items():
-            if not conjunto_nfa.isdisjoint(self.estadosFinais):
-                afdEstadosFinais.add(nome_dfa)
+            token_encontrado = None
+
+            for estado_nfa_original in conjunto_nfa:
+                if estado_nfa_original in self.estadosFinais:
+                    token_encontrado = self.estadosFinais[estado_nfa_original]
+
+                    break
+
+            if token_encontrado:
+                afdEstadosFinais[nome_dfa] = token_encontrado
 
         return AFND(
             estados=dfa_estados,
@@ -162,7 +172,8 @@ class AFND:
             if estado == self.estadoInicial:
                 prefixo += "->"
             if estado in self.estadosFinais:
-                prefixo += "*"
+                prefixo += f"*(T: {self.estadosFinais[estado]})"
+
             largura_col_estados = max(largura_col_estados, len(f"{prefixo}{estado}"))
 
         for estado in estados_ordenados:
@@ -193,7 +204,7 @@ class AFND:
             if estado == self.estadoInicial:
                 prefixo += "->"
             if estado in self.estadosFinais:
-                prefixo += "*"
+                prefixo += f"*(T: {self.estadosFinais[estado]})"
 
             label_estado = f"{prefixo}{estado}"
             print(f"{label_estado:<{largura_col_estados}} |", end="")

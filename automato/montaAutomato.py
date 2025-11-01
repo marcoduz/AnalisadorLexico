@@ -14,7 +14,7 @@ from automato.AFND import AFND
 
 def usingTokens(tokens: list, AFNDs: list = []):
     for t in tokens:
-        automato = AFND({"q0"}, set(), {}, "q0", set())
+        automato = AFND({"q0"}, set(), {}, "q0", {})
         i = 0
         estadoAtual = "q0"
         for c in t:
@@ -25,7 +25,7 @@ def usingTokens(tokens: list, AFNDs: list = []):
             automato.adicionar_transicao(estadoAtual, c, novoEstado)
             estadoAtual = novoEstado
 
-        automato.estadosFinais.add(estadoAtual)
+        automato.estadosFinais[estadoAtual] = t
         AFNDs.append(automato)
 
     return AFNDs
@@ -44,10 +44,10 @@ Returns:
 """
 
 
-def usingGramaticas(gramaticas: list[str], AFNDs: list[AFND] = []):
-    for gramatica in gramaticas:
+def usingGramaticas(gramaticas: dict[str, list[str]], AFNDs: list[AFND] = []):
+    for token_name, gramatica in gramaticas.items():
         relacaoNaoTerminalEstado = {}
-        estadosFinais = set()
+        estadosFinais_locais = set()
         estadosAutomato = set()
         naoTerminais = set()
 
@@ -58,7 +58,7 @@ def usingGramaticas(gramaticas: list[str], AFNDs: list[AFND] = []):
             naoTerminais.add(estado)
             for producao in restante.split("|"):
                 if producao == "":
-                    estadosFinais.add(estado.strip())
+                    estadosFinais_locais.add(estado.strip())
                 for char in producao.strip():
                     if "A" <= char <= "Z":
                         naoTerminais.add(char)
@@ -84,7 +84,7 @@ def usingGramaticas(gramaticas: list[str], AFNDs: list[AFND] = []):
             alfabeto=set(),
             transicoes={},
             estadoInicial=estadoInicial,
-            estadosFinais=set(),
+            estadosFinais={},
         )
 
         # Constrói as transições para o autômato novo
@@ -105,7 +105,7 @@ def usingGramaticas(gramaticas: list[str], AFNDs: list[AFND] = []):
                 if terminal:
                     automato.alfabeto.add(terminal)
                 else:
-                    automato.estadosFinais.add(estadoOrigem)
+                    automato.estadosFinais[estadoOrigem] = token_name
 
                 if not proximoEstado:
                     continue
@@ -134,14 +134,14 @@ def unirAFNDs(AFNDs: list[AFND], estadoInicial="q0"):
 
     # Verificações se existe um autômato e se existe somente 1
     if not AFNDs:
-        return AFND({estadoInicial}, set(), {}, estadoInicial, set())
+        return AFND({estadoInicial}, set(), {}, estadoInicial, {})
     if len(AFNDs) == 1:
         return AFNDs[0]
 
     novosEstados = {estadoInicial}
     novoAlfabeto = set()
     novasTransicoes = {}
-    novosEstadosFinais = set()
+    novosEstadosFinais = {}
 
     for i, automato in enumerate(AFNDs):
         mapaRenomeacao = {automato.estadoInicial: estadoInicial}
@@ -159,8 +159,8 @@ def unirAFNDs(AFNDs: list[AFND], estadoInicial="q0"):
         novoAlfabeto.update(automato.alfabeto)
 
         # Adiciona os estados finais renomeados
-        for ef in automato.estadosFinais:
-            novosEstadosFinais.add(mapaRenomeacao[ef])
+        for ef_estado, ef_token in automato.estadosFinais.items():
+            novosEstadosFinais[mapaRenomeacao[ef_estado]] = ef_token
 
         # 3. Copia e MESCLA as transições
         for (origem, simbolo), destinos in automato.transicoes.items():
