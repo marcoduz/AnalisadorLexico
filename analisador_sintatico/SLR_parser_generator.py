@@ -16,7 +16,7 @@ def obter_dados_completos_do_site(
     2. A tabela de parsing SLR.
     Retorna um dicionário com todos os dados.
     """
-    print("Iniciando automação do navegador)...")
+    print("Iniciando automação do navegador...")
 
     driver = webdriver.Chrome()
 
@@ -97,7 +97,7 @@ def gerar_gramatica(glc: GLC) -> str | None:
 
         for producao in producoes:
             regra = f"{nao_terminal} -> {producao.replace('ε', "''")}"
-            print(regra)
+            # print(regra)
             regras_texto.append(regra)
 
     gramatica_final_texto = "\n".join(regras_texto)

@@ -24,7 +24,11 @@ TOKENS = [
 ]
 
 GRAMATICAS = {
-    "t_id": ["S::=$A", "A::=a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|w|y|z"],
+    "t_id": [
+        "S::=$A",
+        "A::=aB|bB|cB|dB|eB|fB|gB|hB|iB|jB|kB|lB|mB|nB|oB|pB|qB|rB|sB|tB|uB|vB|wB|xB|yB|zB|wB|yB|zB",
+        "B::=aB|bB|cB|dB|eB|fB|gB|hB|iB|jB|kB|lB|mB|nB|oB|pB|qB|rB|sB|tB|uB|vB|wB|xB|yB|zB|wB|yB|zB|_B|0B|1B|2B|3B|4B|5B|6B|7B|8B|9B|",
+    ],
     "t_num": [
         "S::=1A|2A|3A|4A|5A|6A|7A|8A|9A|0A",
         "A::=1A|2A|3A|4A|5A|6A|7A|8A|9A|0A|",

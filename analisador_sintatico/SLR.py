@@ -81,3 +81,17 @@ class SLR:
                 print(f"{nt:<15} | {sets['FIRST']:<20} | {sets['FOLLOW']:<20}")
         else:
             print("Nenhuma tabela de FIRST/FOLLOW encontrada.")
+
+        print("\n--- Tabela de ACTION ---\n")
+        if self.tabela_action:
+            print(f"{'Estado':<10} | {'Simbolo':<10} | {'Acao':<10}")
+            print("-" * 30)
+            for estado, simbolos in self.tabela_action.items():
+                for simbolo, acao in simbolos.items():
+                    print(f"{estado:<10} | {simbolo:<10} | {acao:<10}")
+        else:
+            print("Nenhuma tabela de ACTION encontrada.")
+
+        print("\n--- Tabela de GOTO ---\n")
+        if self.tabela_transicao:
+            print(f"{'Estado':<10} | {'Simbolo':<10} | {'Estado':<10}")

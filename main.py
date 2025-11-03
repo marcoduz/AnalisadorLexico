@@ -27,6 +27,3 @@ glc = GLC(
 glc.criarGramatica()
 
 gramatica_gerada = gerar_gramatica(glc)
-
-slr = SLR(gramatica_gerada, glc.naoTerminais)
-slr.exibir()
