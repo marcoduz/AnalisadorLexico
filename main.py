@@ -27,3 +27,11 @@ glc = GLC(
 glc.criarGramatica()
 
 gramatica_gerada = gerar_gramatica(glc)
+
+slr = SLR(gramatica_gerada, NAO_TERMINAIS)
+
+#print(fita[0])
+
+#slr.exibir()
+
+slr.resolver(fita)

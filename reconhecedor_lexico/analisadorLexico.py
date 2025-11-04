@@ -23,12 +23,13 @@ def analisadorLexico(AFD: AFND, fita: list, ts: list):
 
                     token_final = None
 
-                    if estadoCorrente in AFD.estadosFinais:
-                        token_final = AFD.estadosFinais[estadoCorrente]
-
-                    if not (estadoCorrente in AFD.estadosFinais):
-                        estadoCorrente = "X"
+                    if estadoCorrente == "X":
                         token_final = "ERRO_LEXICO"
+                    elif estadoCorrente in AFD.estadosFinais:
+                        token_final = AFD.estadosFinais[estadoCorrente]
+                    else:
+                        token_final = "ERRO_LEXICO"
+                        estadoCorrente = "X"
 
                     ts.append(
                         {
@@ -39,13 +40,20 @@ def analisadorLexico(AFD: AFND, fita: list, ts: list):
                         }
                     )
 
-        for _, group in groupby(ts, key=lambda t: t["linha"]):
+        ts_validados = []
+        ts.sort(key=lambda t: t["linha"])
+
+        for linha, group in groupby(ts, key=lambda t: t["linha"]):
             tokens_da_linha = list(group)
-            tem_erro = any(t["token"] == "ERRO_LEXICO" for t in tokens_da_linha)
+            tem_erro = any(t["token"] == "ERRO_LEXICO" or t["estado_final"] == "X" for t in tokens_da_linha)
 
             if not tem_erro:
-                fita_da_linha = " ".join([t["token"] for t in tokens_da_linha])
-                fita.append(fita_da_linha)
+                tokens_da_fita = [t["token"] for t in tokens_da_linha]
+                fita.append(tokens_da_fita)
+                ts_validados.extend(tokens_da_linha)
 
+        ts.clear()
+        ts.extend(ts_validados)
+            
     except FileNotFoundError:
         print("Erro ao abrir o arquivo './arquivos/codigo.txt'")

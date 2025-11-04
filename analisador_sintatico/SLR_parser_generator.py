@@ -61,7 +61,7 @@ def obter_dados_completos_do_site(
         linhas_slr = tabela_slr_div.find_elements(By.TAG_NAME, "tr")
         for linha in linhas_slr:
             celulas = linha.find_elements(By.XPATH, ".//th | .//td")
-            linha_dados = [celula.text.replace("\n", "") for celula in celulas]
+            linha_dados = [celula.text.replace("\n", "").strip() for celula in celulas]
             if linha_dados and "LR table" not in linha_dados[0]:
                 dados_extraidos["tabela_slr"].append(linha_dados)
         print("Tabela de parsing SLR extraída com sucesso!")
@@ -80,6 +80,7 @@ def obter_dados_completos_do_site(
     finally:
         print("Fechando o navegador.")
         driver.quit()
+        
 
 
 def gerar_gramatica(glc: GLC) -> str | None:
@@ -97,7 +98,7 @@ def gerar_gramatica(glc: GLC) -> str | None:
 
         for producao in producoes:
             regra = f"{nao_terminal} -> {producao.replace('ε', "''")}"
-            # print(regra)
+            #print(regra)
             regras_texto.append(regra)
 
     gramatica_final_texto = "\n".join(regras_texto)
@@ -108,7 +109,7 @@ def gerar_gramatica(glc: GLC) -> str | None:
         "tabela_slr": [],
     }
 
-    for index, regra in enumerate(regras_texto, 1):
+    for index, regra in enumerate(regras_texto, 0):
         dados["producoes"].append([index, regra])
 
     obter_dados_completos_do_site(gramatica_final_texto, dados)
