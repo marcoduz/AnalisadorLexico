@@ -1,10 +1,10 @@
-from analisador_sintatico.analisador_sintatico import AnalisadorSemantico
-from gramatica_livre_contexto.GLC import *
-from automato.montaAutomato import *
-from reconhecedor_lexico.analisadorLexico import *
-from analisador_sintatico.SLR_parser_generator import *
-from analisador_sintatico.SLR import *
-from arquivos.constantes import *
+from src.analisador.lexico.builder import *
+from src.analisador.sintatico.slr import SLR
+from src.analisador.sintatico.parser import AnalisadorSemantico
+from src.analisador.sintatico.gramatica import *
+from src.analisador.lexico.analisador import *
+from src.constantes import *
+from src.analisador.sintatico.slr_generator import gerar_gramatica
 
 
 fita = []
@@ -19,7 +19,7 @@ AFNDs = usingGramaticas(GRAMATICAS, AFNDs)
 AFNDUnique = unirAFNDs(AFNDs)
 AFDetrministico = AFNDUnique.determinizar()
 
-analisadorLexico(AFDetrministico, fita, ts)
+analisadorLexico(AFDetrministico, fita, ts, "./input/codigo.txt")
 
 print(f"--- Análise Léxica Concluída: {len(fita)} linhas válidas encontradas ---")
 

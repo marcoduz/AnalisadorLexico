@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-from gramatica_livre_contexto.GLC import GLC
+from src.analisador.sintatico.gramatica import GLC
 
 
 def obter_dados_completos_do_site(

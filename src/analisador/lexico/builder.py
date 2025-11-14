@@ -1,4 +1,4 @@
-from automato.AFND import AFND
+from src.analisador.lexico.afnd import AFND
 
 """
     Monta um Automâto finito não deterministico de acordo com os tokens recebidos

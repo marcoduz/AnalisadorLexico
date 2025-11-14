@@ -1,10 +1,10 @@
 from itertools import groupby
-from automato.AFND import AFND
+from src.analisador.lexico.afnd import AFND
 
 
-def analisadorLexico(AFD: AFND, fita: list, ts: list):
+def analisadorLexico(AFD: AFND, fita: list, ts: list, caminho_do_codigo: str):
     try:
-        with open("./arquivos/codigo.txt", "r") as arquivo:
+        with open(caminho_do_codigo, "r") as arquivo:
 
             for i, linha in enumerate(arquivo):
                 linhaFormatada = linha.strip()
@@ -45,15 +45,18 @@ def analisadorLexico(AFD: AFND, fita: list, ts: list):
 
         for linha, group in groupby(ts, key=lambda t: t["linha"]):
             tokens_da_linha = list(group)
-            tem_erro = any(t["token"] == "ERRO_LEXICO" or t["estado_final"] == "X" for t in tokens_da_linha)
+            tem_erro = any(
+                t["token"] == "ERRO_LEXICO" or t["estado_final"] == "X"
+                for t in tokens_da_linha
+            )
 
             if not tem_erro:
-                #tokens_da_fita = [t["token"] for t in tokens_da_linha]
+                # tokens_da_fita = [t["token"] for t in tokens_da_linha]
                 fita.append(tokens_da_linha)
                 ts_validados.extend(tokens_da_linha)
 
         ts.clear()
         ts.extend(ts_validados)
-            
+
     except FileNotFoundError:
         print("Erro ao abrir o arquivo './arquivos/codigo.txt'")
