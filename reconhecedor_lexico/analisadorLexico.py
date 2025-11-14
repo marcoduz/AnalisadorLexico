@@ -48,8 +48,8 @@ def analisadorLexico(AFD: AFND, fita: list, ts: list):
             tem_erro = any(t["token"] == "ERRO_LEXICO" or t["estado_final"] == "X" for t in tokens_da_linha)
 
             if not tem_erro:
-                tokens_da_fita = [t["token"] for t in tokens_da_linha]
-                fita.append(tokens_da_fita)
+                #tokens_da_fita = [t["token"] for t in tokens_da_linha]
+                fita.append(tokens_da_linha)
                 ts_validados.extend(tokens_da_linha)
 
         ts.clear()
