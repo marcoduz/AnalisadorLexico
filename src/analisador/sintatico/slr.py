@@ -325,41 +325,40 @@ class SLR:
         # Se nenhuma regra bateu, retorna um nó genérico para depuração
         return {"tipo": regra_lhs, "filhos": simbolos_reduzidos}
 
-    def resolver(self, fita: list[list[dict]]):
+    def resolver(self, fita_tokens: list[list[dict]]):
         """
         Itera sobre a fita (uma lista de listas de tokens)
         e chama o parser para cada linha.
         """
 
-        arvores_sintaticas = []
 
-        for tokens_linha in fita:
+        if not fita_tokens:
+            print("\nNenhum token válido encontrado para análise.")
+            return []
 
-            linha_num = tokens_linha[-1]["linha"]
-            fita_com_marcador = tokens_linha + [
-                {"token": "$", "label": "$", "linha": linha_num}
-            ]
+        print(f"\nAnalisando programa com {len(fita_tokens)} tokens...")
 
-            try:
-                ast_raiz = self.parse(fita_com_marcador)
+        linha_num_final = fita_tokens[-1]["linha"]
+        fita_com_marcador = fita_tokens + [
+            {"token": "$", "label": "$", "linha": linha_num_final}
+        ]
 
-                if ast_raiz:
-                    print(f"\nLinha {linha_num}: Sintaxe Aceita.")
-                    arvores_sintaticas.append(ast_raiz)
-                else:
-                    print(
-                        f"\nLinha {linha_num}: Rejeitada (Erro de parser desconhecido)."
-                    )
+        try:
+            ast_raiz = self.parse(fita_com_marcador) 
 
-            except (Exception, SyntaxError) as e:
-                print(f"\nLinha {linha_num}: Rejeita (Sintaxe)")
-                print(f"  --> {e}")
+            if ast_raiz:
+                print(f"\nSintaxe do programa: Aceita.")
+                return [ast_raiz] 
+            else:
+                print(f"\nPrograma Rejeitado (Erro de parser desconhecido).")
 
-                print("  ", " ".join([t.get("label", "") for t in tokens_linha]))
+        except (Exception, SyntaxError) as e:
+            print(f"\nPrograma Rejeitado (Sintaxe)")
+            print(f"  --> {e}")
+        
+        print("\n" + "---" * 10)
 
-            print("\n" + "---" * 10)
-
-        return arvores_sintaticas
+        return []
 
     def exibir(self):
         """

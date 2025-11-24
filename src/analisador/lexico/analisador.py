@@ -43,19 +43,12 @@ def analisadorLexico(AFD: AFND, fita: list, ts: list, caminho_do_codigo: str):
         ts_validados = []
         ts.sort(key=lambda t: t["linha"])
 
-        for linha, group in groupby(ts, key=lambda t: t["linha"]):
-            tokens_da_linha = list(group)
-            tem_erro = any(
-                t["token"] == "ERRO_LEXICO" or t["estado_final"] == "X"
-                for t in tokens_da_linha
-            )
-
-            if not tem_erro:
-                # tokens_da_fita = [t["token"] for t in tokens_da_linha]
-                fita.append(tokens_da_linha)
-                ts_validados.extend(tokens_da_linha)
+        for token in ts:
+            if token["label"].strip() != "":
+                ts_validados.append(token)
 
         ts.clear()
+        fita.extend(ts_validados)
         ts.extend(ts_validados)
 
     except FileNotFoundError:

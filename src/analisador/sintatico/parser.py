@@ -1,7 +1,3 @@
-# AnalisadorLexico/analisador_sintatico/analisador_semantico.py
-# NOVO ARQUIVO
-
-
 class AnalisadorSemantico:
     """
     Esta classe (Etapa 2) recebe a Árvore Sintática Abstrata (AST)
@@ -22,22 +18,22 @@ class AnalisadorSemantico:
         (cada AST representa uma linha de código) e as analisa.
         """
 
-        print("\n" + "=" * 50)
-        print(" INICIANDO ANÁLISE SEMÂNTICA (Etapa 2)")
-        print("=" * 50 + "\n")
-
         for ast_raiz in lista_asts:
             linha = self._get_linha(ast_raiz)
             try:
                 self.visitar_no(ast_raiz)
 
-                print(f"Linha {linha}: Análise Semântica Aceita.")
+                print(f"Codigo {linha}: Análise Semântica Aceita.")
 
             except Exception as e:
-                print(f"\nLinha {linha}: Rejeitada (Semântica)")
+                print(f"\nCodigo {linha}: Rejeitada (Semântica)")
                 print(f"  --> {e}")
+                
+                return False
 
             print("\n" + "---" * 10)
+
+        return True
 
     def _get_linha(self, no: dict):
         """Função utilitária para extrair o número da linha de um nó."""
@@ -69,65 +65,65 @@ class AnalisadorSemantico:
             var_nome = no["variavel"]["label"]
             linha = self._get_linha(no)
 
-            # Visita os filhos para obter seus valores e tipos
+            # 1. Avalia o primeiro valor (Lado esquerdo da expressão aritmética)
             val_node = self.visitar_no(no["expressao_val"])
-            eq_node = self.visitar_no(no["expressao_eq"])
+            
+            if val_node.get("tipo_dado") != "int":
+                raise Exception(f"Erro Semântico (Linha {linha}): Tipo incompatível na inicialização de '{var_nome}'. Esperado 'int'.")
 
-            # --- Início da Análise Semântica (Lógica do 'executar_acao_semantica' original) ---
-            if val_node.get("tipo_dado") != "int" or eq_node.get("tipo_dado") != "int":
-                raise Exception(
-                    f"Erro Semântico (Linha {linha}): Tipos incompatíveis na atribuição da variável '{var_nome}'."
-                )
+            valor_acumulado = val_node["valor"]
 
-            var_valor = val_node["valor"] + eq_node["valor"]
-            var_tipo = "int"  # Assumindo que todas as atribuições são int
+            # 2. Itera sobre a cadeia EQ (Lado direito: OP VAL EQ ...)
+            # Transforma a recursão à direita em um loop iterativo (Esquerda -> Direita)
+            curr_eq = no["expressao_eq"]
+            
+            while curr_eq and curr_eq.get("tipo_no") == "EQ_RECURSIVO":
+                # Visita o operador e o próximo valor
+                op_node = self.visitar_no(curr_eq["operador"])
+                rhs_node = self.visitar_no(curr_eq["valor"])
+                
+                if rhs_node.get("tipo_dado") != "int":
+                    raise Exception(f"Erro Semântico (Linha {linha}): Operação aritmética com tipo não inteiro.")
 
-            # Atualiza ou insere na Tabela de Símbolos Global
+                operador = op_node["valor"]
+                rhs_valor = rhs_node["valor"]
+
+                # Executa a operação acumulando no valor total
+                if operador == "+":
+                    valor_acumulado += rhs_valor
+                elif operador == "-":
+                    valor_acumulado -= rhs_valor
+                elif operador == "*":
+                    valor_acumulado *= rhs_valor
+                elif operador == "/":
+                    if rhs_valor == 0:
+                        raise Exception(
+                            f"Erro Semântico (Linha {linha}): Divisão por zero na atribuição de '{var_nome}'."
+                        )
+                    valor_acumulado = int(valor_acumulado / rhs_valor)
+
+                # Avança para o próximo nó da cadeia EQ
+                curr_eq = curr_eq["resto"]
+
+            # 3. Salva o resultado final na Tabela de Símbolos
+            var_tipo = "int"
             self.tabela_simbolos_global[var_nome] = {
-                "valor": var_valor,
+                "valor": valor_acumulado,
                 "tipo_dado": var_tipo,
             }
-            print(
-                f"[AÇÃO SEMÂNTICA (Linha {linha})]: Variável '{var_nome}' definida como {var_valor} (Tipo: {var_tipo})"
-            )
-            return None  # Atribuição não retorna valor
+            # print(
+            #     f"[AÇÃO SEMÂNTICA (Linha {linha})]: Variável '{var_nome}' definida como {valor_acumulado} (Tipo: {var_tipo})"
+            # )
+            return None
 
-        # --- NÓS DE EXPRESSÃO ARITMÉTICA ---
+        # --- NÓS DE EXPRESSÃO ARITMÉTICA (EQ) ---
+        # Nota: Com a lógica iterativa no SALVAR_VAR, esses nós são processados manualmente lá.
+        # Mantemos aqui apenas caso seja necessário visitar individualmente (ex: debug),
+        # mas a lógica principal de cálculo foi movida para o loop acima.
         elif tipo_no == "EQ_RECURSIVO":
-            # Visita os filhos
-            op_node = self.visitar_no(no["operador"])
-            val_node = self.visitar_no(no["valor"])
-            eq_node = self.visitar_no(no["resto"])  # O resultado do resto da expressão
-            linha = self._get_linha(no)
-
-            if val_node.get("tipo_dado") != "int" or eq_node.get("tipo_dado") != "int":
-                raise Exception(
-                    f"Erro Semântico (Linha {linha}): Operação aritmética com tipos incompatíveis (esperado 'int')."
-                )
-
-            operador = op_node["valor"]  # O 'valor' de um nó OP é seu label
-            v_val = val_node["valor"]
-            v_eq = eq_node["valor"]
-
-            resultado = 0
-            if operador == "+":
-                resultado = v_val + v_eq
-            elif operador == "-":
-                resultado = v_val - v_eq
-            elif operador == "*":
-                resultado = v_val * v_eq
-            elif operador == "/":
-                if v_eq == 0:
-                    raise Exception(
-                        f"Erro Semântico (Linha {linha}): Divisão por zero."
-                    )
-                resultado = int(v_val / v_eq)
-
-            return {"valor": resultado, "tipo_dado": "int"}
-
+             return None 
         elif tipo_no == "EQ_EPSILON":
-            # Caso base da recursão de expressão: ε (identidade)
-            return {"valor": 0, "tipo_dado": "int"}
+             return None
 
         # --- NÓS DE ESTRUTURA DE CONTROLE (IF) ---
         elif tipo_no == "CODIGO_IF":
